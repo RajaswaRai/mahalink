@@ -1,0 +1,329 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Dashboard - Campus Org</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=JetBrains+Mono:wght@600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-primary-fixed": "#001a40",
+                "surface-container-highest": "#e5e2dd",
+                "tertiary-container": "#533e00",
+                "alert-red": "#b7102a",
+                "on-background": "#1c1c19",
+                "surface-container-lowest": "#ffffff",
+                "on-secondary-fixed-variant": "#92001d",
+                "secondary": "#b7102a",
+                "tertiary-fixed-dim": "#f5bf22",
+                "on-secondary": "#ffffff",
+                "secondary-container": "#db3140",
+                "outline-variant": "#c4c6d1",
+                "primary-container": "#1b4079",
+                "tertiary-fixed": "#ffdf98",
+                "surface-bright": "#fcf9f4",
+                "inverse-surface": "#31302d",
+                "error": "#ba1a1a",
+                "primary-fixed-dim": "#acc7ff",
+                "on-primary": "#ffffff",
+                "secondary-fixed": "#ffdad8",
+                "surface-variant": "#e5e2dd",
+                "outline": "#747781",
+                "background": "#fcf9f4",
+                "surface-container": "#f0ede9",
+                "surface-container-high": "#ebe8e3",
+                "surface-cream": "#fdfaf5",
+                "on-error-container": "#93000a",
+                "primary": "#00295d",
+                "primary-fixed": "#d7e2ff",
+                "on-tertiary-container": "#d8a600",
+                "academic-blue": "#1b4079",
+                "on-secondary-fixed": "#410007",
+                "on-tertiary": "#ffffff",
+                "ink-black": "#1a1a1b",
+                "surface-dim": "#dcdad5",
+                "on-primary-container": "#8daded",
+                "on-secondary-container": "#fffbff",
+                "inverse-primary": "#acc7ff",
+                "on-tertiary-fixed": "#251a00",
+                "error-container": "#ffdad6",
+                "inverse-on-surface": "#f3f0eb",
+                "secondary-fixed-dim": "#ffb3b1",
+                "border-subtle": "#d1cfcc",
+                "on-tertiary-fixed-variant": "#5a4300",
+                "surface-tint": "#3d5e99",
+                "surface": "#fcf9f4",
+                "on-surface-variant": "#434750",
+                "on-surface": "#1c1c19",
+                "surface-container-low": "#f6f3ee",
+                "focus-yellow": "#e1ad01",
+                "tertiary": "#382900",
+                "on-primary-fixed-variant": "#22467f",
+                "on-error": "#ffffff"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+        },
+        "spacing": {
+                "xl": "96px",
+                "gutter": "32px",
+                "sm": "16px",
+                "base": "8px",
+                "md": "32px",
+                "xs": "4px",
+                "lg": "64px",
+                "margin": "48px"
+        },
+        "fontFamily": {
+                "headline-lg": [
+                        "Hanken Grotesk"
+                ],
+                "headline-md": [
+                        "Hanken Grotesk"
+                ],
+                "headline-xl": [
+                        "Hanken Grotesk"
+                ],
+                "body-lg": [
+                        "Hanken Grotesk"
+                ],
+                "body-md": [
+                        "Hanken Grotesk"
+                ],
+                "headline-lg-mobile": [
+                        "Hanken Grotesk"
+                ],
+                "label-caps": [
+                        "JetBrains Mono"
+                ]
+        },
+        "fontSize": {
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-xl": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "32px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "34px",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-caps": [
+                        "13px",
+                        {
+                                "lineHeight": "16px",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "600"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-background min-h-screen font-body-md overflow-x-hidden selection:bg-primary-container selection:text-on-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin h-20 bg-surface border-b border-border-subtle shadow-sm">
+<div class="flex items-center gap-sm">
+<button class="md:hidden text-on-surface hover:bg-surface-variant p-2 rounded border border-transparent active:scale-95 transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">menu</span>
+</button>
+<span class="font-headline-md text-headline-md font-semibold text-primary">Campus Org</span>
+</div>
+<div class="flex items-center">
+<div class="font-label-caps text-label-caps flex items-center gap-sm hover:bg-surface-variant p-2 rounded border border-transparent active:scale-95 transition-all cursor-pointer text-on-surface-variant">
+<span class="hidden sm:inline">User Profile</span>
+<div class="w-8 h-8 bg-surface-container-high rounded-full flex items-center justify-center text-on-surface">
+<span class="material-symbols-outlined text-[18px]">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- NavigationDrawer (Desktop) -->
+<nav class="hidden md:flex fixed left-0 top-0 h-full z-[40] flex-col p-md gap-base w-64 bg-surface-cream border-r border-border-subtle pt-24">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-sm uppercase tracking-wider">Navigation</div>
+<a class="flex items-center gap-sm p-sm bg-primary-container text-on-primary rounded font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant rounded hover:bg-surface-variant font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span>Members</span>
+</a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant rounded hover:bg-surface-variant font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">account_balance_wallet</span>
+<span>Finance</span>
+</a>
+<a class="flex items-center gap-sm p-sm text-on-surface-variant rounded hover:bg-surface-variant font-label-caps text-label-caps transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+<span>Events</span>
+</a>
+</nav>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 pb-24 md:pb-margin px-margin min-h-screen bg-background">
+<div class="max-w-5xl mx-auto space-y-xl">
+<!-- Dashboard Header -->
+<div class="flex justify-between items-end border-b border-border-subtle pb-md">
+<div>
+<h1 class="font-headline-xl text-headline-lg-mobile md:text-headline-xl text-on-background tracking-tight">Overview</h1>
+<div class="flex items-center gap-xs mt-xs text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<p class="font-label-caps text-label-caps uppercase">System Status: Nominal</p>
+</div>
+</div>
+<button class="hidden md:flex items-center gap-xs bg-primary text-on-primary rounded px-md py-sm font-label-caps text-label-caps hover:bg-academic-blue transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    New Entry
+                </button>
+</div>
+<!-- Bento Grid Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Total Cash -->
+<div class="col-span-1 md:col-span-8 bg-surface-container-lowest border border-border-subtle rounded-lg flex flex-col justify-between overflow-hidden shadow-sm">
+<div class="p-md border-b border-border-subtle flex justify-between items-center">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">account_balance_wallet</span> Total Cash (Kas)
+                        </span>
+<span class="font-label-caps text-label-caps bg-surface-container-high text-on-surface px-sm py-xs rounded">Live</span>
+</div>
+<div class="p-lg flex-grow flex items-center justify-center relative">
+<div class="text-center z-10">
+<span class="font-headline-xl text-[48px] md:text-headline-xl text-primary font-bold tracking-tight">€12,450.00</span>
+<p class="font-body-md text-on-surface-variant mt-xs">Current balance</p>
+</div>
+</div>
+</div>
+<!-- Active Members -->
+<div class="col-span-1 md:col-span-4 bg-surface-container-lowest border border-border-subtle rounded-lg shadow-sm flex flex-col">
+<div class="p-sm border-b border-border-subtle flex justify-between items-center">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">group</span> Active Members
+                        </span>
+</div>
+<div class="p-md flex-grow flex flex-col justify-center items-center">
+<span class="font-headline-xl text-[56px] font-bold text-on-background">142</span>
+<div class="mt-base font-label-caps text-label-caps text-primary bg-primary-fixed px-sm py-xs rounded-full">+12 This Month</div>
+</div>
+</div>
+<!-- Upcoming Agenda (Countdown) -->
+<div class="col-span-1 md:col-span-6 bg-surface-container-lowest border border-border-subtle rounded-lg shadow-sm flex flex-col">
+<div class="p-md border-b border-border-subtle flex justify-between items-center">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">event</span> Upcoming Agenda
+                        </span>
+<span class="font-label-caps text-label-caps px-sm py-xs border border-border-subtle text-on-surface-variant rounded">Q3 Plan</span>
+</div>
+<div class="p-md flex-grow flex flex-col justify-center">
+<h3 class="font-headline-md text-headline-md text-on-background mb-md">General Assembly</h3>
+<div class="flex gap-sm mb-lg">
+<div class="bg-surface text-on-background border border-border-subtle rounded p-sm text-center min-w-[64px]">
+<span class="block font-headline-md text-headline-md">04</span>
+<span class="block font-label-caps text-label-caps text-[10px] text-on-surface-variant">DAYS</span>
+</div>
+<div class="bg-surface text-on-background border border-border-subtle rounded p-sm text-center min-w-[64px]">
+<span class="block font-headline-md text-headline-md">12</span>
+<span class="block font-label-caps text-label-caps text-[10px] text-on-surface-variant">HOURS</span>
+</div>
+</div>
+<button class="bg-surface text-primary border border-border-subtle rounded px-md py-sm font-label-caps text-label-caps uppercase hover:bg-surface-variant transition-colors self-start">
+                            View Details
+                        </button>
+</div>
+</div>
+<!-- Internal Announcements -->
+<div class="col-span-1 md:col-span-6 bg-surface-container-lowest border border-border-subtle rounded-lg shadow-sm flex flex-col">
+<div class="p-md border-b border-border-subtle flex justify-between items-center">
+<span class="font-label-caps text-label-caps uppercase text-on-surface-variant flex items-center gap-xs">
+<span class="material-symbols-outlined text-[18px]">campaign</span> Announcements
+                        </span>
+</div>
+<div class="flex-grow flex flex-col">
+<!-- List Item 1 -->
+<div class="flex items-center gap-md p-md border-b border-border-subtle hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+</div>
+<div>
+<h4 class="font-headline-md text-[16px] font-semibold text-on-background line-clamp-1">Server Maintenance Schedule</h4>
+<p class="font-label-caps text-[11px] text-on-surface-variant mt-xs">Posted 2 hrs ago</p>
+</div>
+</div>
+<!-- List Item 2 -->
+<div class="flex items-center gap-md p-md hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]">description</span>
+</div>
+<div>
+<h4 class="font-headline-md text-[16px] font-semibold text-on-background line-clamp-1">Q2 Finance Report Available</h4>
+<p class="font-label-caps text-[11px] text-on-surface-variant mt-xs">Posted Yesterday</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 h-16 flex justify-around items-stretch bg-surface border-t border-border-subtle">
+<a class="flex flex-col items-center justify-center text-primary bg-primary-fixed bg-opacity-20 h-full px-4 active:scale-95 transition-transform w-full" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="font-label-caps text-[10px] mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant h-full px-4 active:scale-95 transition-transform hover:bg-surface-variant w-full" href="#">
+<span class="material-symbols-outlined text-[24px]">payments</span>
+<span class="font-label-caps text-[10px] mt-1">Finance</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant h-full px-4 active:scale-95 transition-transform hover:bg-surface-variant w-full" href="#">
+<span class="material-symbols-outlined text-[24px]">event</span>
+<span class="font-label-caps text-[10px] mt-1">Events</span>
+</a>
+</nav>
+</body></html>
