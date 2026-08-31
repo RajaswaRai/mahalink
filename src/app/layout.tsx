@@ -84,13 +84,13 @@ function Navbar() {
             Beranda
           </Link>
           <Link
-            href="#about"
+            href="/#about"
             className="hover:text-foreground transition-colors"
           >
             Tentang
           </Link>
           <Link
-            href="#services"
+            href="/#services"
             className="hover:text-foreground transition-colors"
           >
             Layanan
@@ -105,12 +105,6 @@ function Navbar() {
 
         {/* CTA */}
         <div className="flex items-center gap-2">
-          <Link
-            href="/login"
-            className="hidden sm:inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium text-foreground hover:bg-muted transition-colors"
-          >
-            Masuk
-          </Link>
           <Link
             href="/login"
             className="inline-flex items-center px-4 py-2 rounded-xl text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors shadow-sm"
@@ -138,6 +132,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       )}
     >
       <body className="min-h-full flex flex-col">
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+          rel="stylesheet"
+        />
         <Navbar />
         {children}
         <Footer />

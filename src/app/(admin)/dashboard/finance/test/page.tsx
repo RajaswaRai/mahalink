@@ -47,57 +47,34 @@ function StatCard({
   );
 }
 
-function AnnouncementItem({
-  icon,
-  iconBg,
-  title,
-  time,
-}: {
-  icon: string;
-  iconBg: string;
-  title: string;
-  time: string;
-}) {
-  return (
-    <div className="flex items-center gap-3 p-4 hover:bg-muted/50 transition-colors cursor-pointer border-b border-border last:border-0">
-      <div
-        className={`w-9 h-9 rounded-full ${iconBg} flex items-center justify-center flex-shrink-0`}
-      >
-        <span className="material-symbols-outlined text-[18px]">{icon}</span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{title}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">{time}</p>
-      </div>
-      <span className="material-symbols-outlined text-[16px] text-muted-foreground">
-        chevron_right
-      </span>
-    </div>
-  );
-}
-
-export default function DashboardPage() {
+export default function FinancePage() {
   return (
     <div className="p-5 md:p-8 max-w-6xl mx-auto space-y-6">
       {/* Page header */}
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Overview</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Cash Tracking</h1>
           <div className="flex items-center gap-1.5 mt-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
             <p className="text-sm text-muted-foreground">
-              System Status: Nominal
+              Manage organizational income and expenses with geometric
+              precision.
             </p>
           </div>
         </div>
-        <Button size="sm">
-          <span className="material-symbols-outlined text-[16px]">add</span>
-          New Entry
-        </Button>
+        <div className="flex gap-3">
+          <Button size="lg">
+            <span className="material-symbols-outlined text-[16px]">add</span>
+            New Entry
+          </Button>
+          <Button size="lg">
+            <span className="material-symbols-outlined text-[16px]">add</span>
+            Export
+          </Button>
+        </div>
       </div>
 
       {/* Stat cards — top row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 sm:grid-cols-3 gap-4">
         <StatCard
           title="Total Kas"
           value="Rp 12.450.000"
@@ -105,12 +82,19 @@ export default function DashboardPage() {
           icon="account_balance_wallet"
           badge="Live"
           badgeVariant="default"
-          className="lg:col-span-2"
         />
         <StatCard
-          title="Anggota Aktif"
+          title="Total Income"
           value="142"
-          subtitle="+12 bulan ini"
+          subtitle="Current Period"
+          icon="group"
+          badge="+12"
+          badgeVariant="secondary"
+        />
+        <StatCard
+          title="Total Expense"
+          value="142"
+          subtitle="Current Period"
           icon="group"
           badge="+12"
           badgeVariant="secondary"
@@ -179,26 +163,6 @@ export default function DashboardPage() {
               <Badge variant="secondary">2 baru</Badge>
             </CardAction>
           </CardHeader>
-          <CardContent className="px-0 pb-0">
-            <AnnouncementItem
-              icon="warning"
-              iconBg="bg-destructive/10 text-destructive"
-              title="Jadwal Pemeliharaan Server"
-              time="2 jam yang lalu"
-            />
-            <AnnouncementItem
-              icon="description"
-              iconBg="bg-blue-100 text-blue-600"
-              title="Laporan Keuangan Q2 Tersedia"
-              time="Kemarin"
-            />
-            <AnnouncementItem
-              icon="event"
-              iconBg="bg-green-100 text-green-600"
-              title="Pengingat: Rapat Koordinasi Besok"
-              time="3 hari yang lalu"
-            />
-          </CardContent>
         </Card>
       </div>
 
@@ -225,12 +189,6 @@ export default function DashboardPage() {
             label: "Arsip Dokumen",
             href: "/dashboard/archives",
           },
-          {
-            icon: "inventory_2",
-            label: "Inventory",
-            href: "/dashboard/inventory",
-          },
-          { icon: "article", label: "Blog", href: "/dashboard/blog" },
         ].map(({ icon, label, href }) => (
           <a
             key={href}

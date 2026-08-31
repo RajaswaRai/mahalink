@@ -12,12 +12,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle, CardAction } from "@/components/ui/card";
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardAction,
+} from "@/components/ui/card";
 
 type Member = {
   id: string;
@@ -29,16 +31,49 @@ type Member = {
 };
 
 const members: Member[] = [
-  { id: "1", name: "A. Turing", studentId: "0921-X", division: "Research", status: "Active" },
-  { id: "2", name: "H. Lamarr", studentId: "0442-Y", division: "Action", status: "Active" },
-  { id: "3", name: "N. Tesla", studentId: "0883-Z", division: "Logistics", status: "Pending" },
-  { id: "4", name: "A. Lovelace", studentId: "0117-A", division: "Media", status: "Active" },
-  { id: "5", name: "C. Darwin", studentId: "0554-B", division: "Research", status: "Inactive" },
+  {
+    id: "1",
+    name: "A. Turing",
+    studentId: "0921-X",
+    division: "Research",
+    status: "Active",
+  },
+  {
+    id: "2",
+    name: "H. Lamarr",
+    studentId: "0442-Y",
+    division: "Action",
+    status: "Active",
+  },
+  {
+    id: "3",
+    name: "N. Tesla",
+    studentId: "0883-Z",
+    division: "Logistics",
+    status: "Pending",
+  },
+  {
+    id: "4",
+    name: "A. Lovelace",
+    studentId: "0117-A",
+    division: "Media",
+    status: "Active",
+  },
+  {
+    id: "5",
+    name: "C. Darwin",
+    studentId: "0554-B",
+    division: "Research",
+    status: "Inactive",
+  },
 ];
 
 const divisions = ["All Divisions", "Action", "Research", "Logistics", "Media"];
 
-const statusVariant: Record<Member["status"], "default" | "secondary" | "outline" | "destructive"> = {
+const statusVariant: Record<
+  Member["status"],
+  "default" | "secondary" | "outline" | "destructive"
+> = {
   Active: "default",
   Pending: "secondary",
   Inactive: "destructive",
@@ -82,7 +117,9 @@ export default function MembersPage() {
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-1">
             Module 02
           </p>
-          <h1 className="text-2xl font-bold tracking-tight">Member Directory</h1>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Member Directory
+          </h1>
         </div>
         <Button size="sm">
           <span className="material-symbols-outlined text-[16px]">add</span>
@@ -92,7 +129,7 @@ export default function MembersPage() {
 
       {/* Filters + Search */}
       <Card>
-        <CardContent className="pt-5 flex flex-col sm:flex-row gap-3">
+        <CardContent className="flex flex-col sm:flex-row gap-3">
           {/* Division filter chips */}
           <div className="flex flex-wrap gap-2 flex-1">
             {divisions.map((div) => (
@@ -128,9 +165,7 @@ export default function MembersPage() {
       {/* Member table */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm">
-            Semua Anggota
-          </CardTitle>
+          <CardTitle className="text-sm">Semua Anggota</CardTitle>
           <CardAction>
             <Badge variant="outline">{filtered.length} anggota</Badge>
           </CardAction>
@@ -148,7 +183,10 @@ export default function MembersPage() {
             <TableBody>
               {filtered.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="text-center py-12 text-muted-foreground text-sm">
+                  <TableCell
+                    colSpan={4}
+                    className="text-center py-12 text-muted-foreground text-sm"
+                  >
                     Tidak ada anggota yang cocok.
                   </TableCell>
                 </TableRow>
@@ -159,16 +197,22 @@ export default function MembersPage() {
                       <div className="flex items-center gap-3">
                         <Avatar size="default">
                           {member.avatar && <AvatarImage src={member.avatar} />}
-                          <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
+                          <AvatarFallback>
+                            {getInitials(member.name)}
+                          </AvatarFallback>
                         </Avatar>
                         <div>
                           <p className="font-medium text-sm">{member.name}</p>
-                          <p className="text-xs text-muted-foreground">ID: {member.studentId}</p>
+                          <p className="text-xs text-muted-foreground">
+                            ID: {member.studentId}
+                          </p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
-                      <span className="text-sm text-muted-foreground">{member.division}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {member.division}
+                      </span>
                     </TableCell>
                     <TableCell>
                       <Badge variant={statusVariant[member.status]}>
@@ -210,7 +254,9 @@ export default function MembersPage() {
                 size="icon-sm"
                 onClick={() => setModalOpen(false)}
               >
-                <span className="material-symbols-outlined text-[18px]">close</span>
+                <span className="material-symbols-outlined text-[18px]">
+                  close
+                </span>
               </Button>
             </div>
 
@@ -218,7 +264,9 @@ export default function MembersPage() {
             <div className="p-5 space-y-4">
               <div className="flex items-center gap-3 p-3 bg-muted rounded-xl">
                 <Avatar>
-                  <AvatarFallback>{getInitials(selectedMember.name)}</AvatarFallback>
+                  <AvatarFallback>
+                    {getInitials(selectedMember.name)}
+                  </AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="text-xs text-muted-foreground">Target</p>
@@ -231,10 +279,26 @@ export default function MembersPage() {
               {/* Role options */}
               <div className="space-y-2">
                 {[
-                  { value: "admin", label: "Administrator", desc: "Akses penuh ke semua fitur" },
-                  { value: "treasurer", label: "Bendahara", desc: "Akses modul keuangan" },
-                  { value: "secretary", label: "Sekretaris", desc: "Kelola arsip dan agenda" },
-                  { value: "member", label: "Anggota Standar", desc: "Akses terbatas" },
+                  {
+                    value: "admin",
+                    label: "Administrator",
+                    desc: "Akses penuh ke semua fitur",
+                  },
+                  {
+                    value: "treasurer",
+                    label: "Bendahara",
+                    desc: "Akses modul keuangan",
+                  },
+                  {
+                    value: "secretary",
+                    label: "Sekretaris",
+                    desc: "Kelola arsip dan agenda",
+                  },
+                  {
+                    value: "member",
+                    label: "Anggota Standar",
+                    desc: "Akses terbatas",
+                  },
                 ].map(({ value, label, desc }) => (
                   <label
                     key={value}
@@ -263,7 +327,11 @@ export default function MembersPage() {
 
             {/* Footer */}
             <div className="flex justify-end gap-2 p-4 border-t border-border bg-muted/30">
-              <Button variant="outline" size="sm" onClick={() => setModalOpen(false)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setModalOpen(false)}
+              >
                 Batal
               </Button>
               <Button size="sm" onClick={() => setModalOpen(false)}>

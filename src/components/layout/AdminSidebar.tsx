@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const navItems = [
   { href: "/dashboard", icon: "dashboard", label: "Dashboard" },
@@ -64,6 +66,47 @@ function NavItem({
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const [isSheetMounted, setIsSheetMounted] = useState(false);
+  const [sheetVisible, setSheetVisible] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const menuSheetItems = [
+    ...navItems,
+    { href: "/dashboard/settings", icon: "settings", label: "Settings" },
+  ];
+
+  const openSheet = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+    setIsSheetMounted(true);
+    setTimeout(() => setSheetVisible(true), 30);
+  };
+
+  const closeSheet = () => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+    setSheetVisible(false);
+    closeTimer.current = setTimeout(() => setIsSheetMounted(false), 300);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (closeTimer.current) clearTimeout(closeTimer.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isSheetMounted) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeSheet();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isSheetMounted]);
 
   const isActive = (href: string) => {
     if (href === "/dashboard") return pathname === "/dashboard";
@@ -134,32 +177,118 @@ export function AdminSidebar() {
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 h-16 flex justify-around items-stretch bg-card border-t border-border safe-area-inset-bottom">
-        {bottomNavItems.map((item) => {
-          const active = isActive(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex flex-col items-center justify-center h-full px-4 transition-colors w-full gap-0.5",
-                active
-                  ? "text-primary"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              <span
-                className="material-symbols-outlined text-[22px]"
-                style={{
-                  fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0",
-                }}
-              >
-                {item.icon}
-              </span>
-              <span className="text-[10px] font-medium">{item.label}</span>
-            </Link>
-          );
-        })}
+        {bottomNavItems.slice(0, 2).map((item) => (
+          <MobileNavLink key={item.href} item={item} active={isActive(item.href)} />
+        ))}
+
+        {/* Center — Menu sheet trigger */}
+        <button
+          onClick={openSheet}
+          className={cn(
+            "flex flex-col items-center justify-center h-full px-4 transition-colors w-full gap-0.5",
+            isSheetMounted ? "text-primary" : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          <span className="material-symbols-outlined text-[22px]">menu</span>
+          <span className="text-[10px] font-medium">Menu</span>
+        </button>
+
+        {bottomNavItems.slice(2).map((item) => (
+          <MobileNavLink key={item.href} item={item} active={isActive(item.href)} />
+        ))}
       </nav>
+
+      {/* Mobile More Sheet */}
+      {isSheetMounted && (
+        <div className="md:hidden fixed inset-0 z-[60] flex flex-col justify-end">
+          <div
+            onClick={closeSheet}
+            className={cn(
+              "absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300",
+              sheetVisible ? "opacity-100" : "opacity-0 pointer-events-none",
+            )}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="mobile-menu-title"
+            className={cn(
+              "relative bg-card border-t border-border rounded-t-3xl shadow-2xl max-h-[75vh] overflow-y-auto safe-area-inset-bottom transition-transform duration-300 ease-out",
+              sheetVisible ? "translate-y-0" : "translate-y-full",
+            )}
+          >
+            <div className="flex items-center justify-between px-5 pt-5 pb-3">
+              <p id="mobile-menu-title" className="text-sm font-semibold">
+                Menu
+              </p>
+              <Button variant="ghost" size="icon-sm" onClick={closeSheet}>
+                <span className="material-symbols-outlined text-[18px]">
+                  close
+                </span>
+              </Button>
+            </div>
+            <ul className="p-4 grid grid-cols-3 gap-2 pb-8">
+              {menuSheetItems.map((item) => {
+                const active = isActive(item.href);
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={closeSheet}
+                      className={cn(
+                        "flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-colors text-center",
+                        active
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "hover:bg-muted text-muted-foreground",
+                      )}
+                    >
+                      <span
+                        className="material-symbols-outlined text-[24px]"
+                        style={{
+                          fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0",
+                        }}
+                      >
+                        {item.icon}
+                      </span>
+                      <span className="text-[10px] font-medium leading-tight">
+                        {item.label}
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+      )}
     </>
+  );
+}
+
+function MobileNavLink({
+  item,
+  active,
+}: {
+  item: { href: string; icon: string; label: string };
+  active: boolean;
+}) {
+  return (
+    <Link
+      href={item.href}
+      className={cn(
+        "flex flex-col items-center justify-center h-full px-4 transition-colors w-full gap-0.5",
+        active ? "text-primary" : "text-muted-foreground hover:text-foreground",
+      )}
+    >
+      <span
+        className="material-symbols-outlined text-[22px]"
+        style={{
+          fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0",
+        }}
+      >
+        {item.icon}
+      </span>
+      <span className="text-[10px] font-medium">{item.label}</span>
+    </Link>
   );
 }

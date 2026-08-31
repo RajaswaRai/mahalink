@@ -1,530 +1,391 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardAction,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+
+const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+const calendarCells = [
+  { day: "29", variant: "outside" },
+  { day: "30", variant: "outside" },
+  { day: "1", variant: "default" },
+  { day: "2", variant: "dot" },
+  { day: "3", variant: "default" },
+  { day: "4", variant: "selected" },
+  { day: "5", variant: "default" },
+  { day: "6", variant: "dot-red" },
+  { day: "7", variant: "today" },
+  { day: "8", variant: "default" },
+  { day: "9", variant: "default" },
+  { day: "10", variant: "default" },
+  { day: "11", variant: "default" },
+  { day: "12", variant: "default" },
+] as const;
+
+const categories = [
+  { name: "Academic", dot: "bg-blue-600" },
+  { name: "Social", dot: "bg-red-500" },
+  { name: "Administrative", dot: "bg-yellow-500" },
+];
+
+const eventCategories = {
+  Academic:
+    "bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/50 dark:text-blue-300",
+  Social:
+    "bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-300",
+  Administrative:
+    "bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-300",
+} as const;
+
+type EventCategory = keyof typeof eventCategories;
+
+const upcomingEvents = [
+  {
+    id: "event1",
+    day: "07",
+    category: "Academic" as EventCategory,
+    time: "14:00 - 16:00",
+    title: "Guest Lecture: Modern Architecture",
+    desc: "A deep dive into Bauhaus principles and their application in contemporary software design.",
+    dateColor:
+      "bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300",
+  },
+  {
+    id: "event2",
+    day: "12",
+    category: "Social" as EventCategory,
+    time: "19:00 - 23:00",
+    title: "End of Midterms Mixer",
+    desc: "Celebrate the end of midterms with fellow members at the Student Union.",
+    dateColor:
+      "bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300",
+  },
+];
+
+const emptyForm = {
+  title: "",
+  date: "",
+  time: "",
+  category: "Academic",
+  description: "",
+};
 
 export default function EventsPage() {
-  // State untuk mengontrol Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // State untuk mengontrol Toggle Notifikasi
-  const [notifications, setNotifications] = useState({
+  const [form, setForm] = useState(emptyForm);
+  const [notifications, setNotifications] = useState<Record<string, boolean>>({
     event1: true,
     event2: false,
   });
 
-  const toggleNotification = (key: "event1" | "event2") => {
+  const openModal = () => {
+    setForm(emptyForm);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setForm(emptyForm);
+    setIsModalOpen(false);
+  };
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeModal();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isModalOpen]);
+
+  const setField =
+    (key: keyof typeof emptyForm) =>
+    (
+      e: React.ChangeEvent<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+      >,
+    ) =>
+      setForm((prev) => ({ ...prev, [key]: e.target.value }));
+
+  const toggleNotification = (key: string) => {
     setNotifications((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   return (
-    <div className="bg-background text-on-background font-body-md min-h-screen flex flex-col pt-20">
-      {/* Mobile Top Header */}
-      <header className="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin h-20 bg-surface border-b border-outline-variant shadow-sm md:hidden">
-        <button className="text-primary active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
-          <span
-            className="material-symbols-outlined"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            menu
-          </span>
-        </button>
-        <div className="font-headline-md text-headline-md font-black uppercase text-primary">
-          CAMPUS_ORG
+    <div className="p-5 md:p-8 max-w-6xl mx-auto space-y-6">
+      {/* Page header */}
+      <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4 border-b border-border pb-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">
+            Events &amp; Agenda
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Manage upcoming organizational activities.
+          </p>
         </div>
-        <div className="w-8 h-8 rounded-full bg-primary-container overflow-hidden relative">
-          {/* <Image
-            alt="User Profile Avatar"
-            className="object-cover"
-            fill
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0RgE1pTiZAdg6wIC4Yzhx9lqKaiCfi9TudqiWFYwnBnNfB6Dthl2kKT6yyUMfKxAaLliHvCRDiNSoRl1HUOmxiitDO8N1AT452nY8VH9kowq2eYGIqcIGsxhFERKOoxYIIh53rutkS7s33XU1uS1F3tAf_JyXL7LLRW5FyUi8Xm5_CzVy21fgU5NlQKXnHYyT_VJv-xOCtWOrFRs1FD8nczMioXg2yDAQosqzUPvIJx2wDDhgVLPUkA"
-          /> */}
-        </div>
-      </header>
+        <Button size="lg" onClick={openModal}>
+          <span className="material-symbols-outlined text-[16px]">add</span>
+          Create Event
+        </Button>
+      </div>
 
-      {/* Desktop Navigation Sidebar */}
-      <nav className="hidden md:flex fixed left-0 top-0 h-full z-[60] flex-col p-md gap-base bg-surface-container w-80 border-r border-outline-variant">
-        <div className="mb-lg">
-          <h2 className="font-headline-md text-headline-md text-on-surface uppercase">
-            CORE_NAV
-          </h2>
-        </div>
-        <ul className="flex flex-col gap-base font-label-caps text-label-caps uppercase">
-          <li>
-            <Link
-              className="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors duration-200"
-              href="#"
-            >
-              <span className="material-symbols-outlined">dashboard</span>
-              Dashboard
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors duration-200"
-              href="#"
-            >
-              <span className="material-symbols-outlined">group</span>
-              Members
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors duration-200"
-              href="#"
-            >
-              <span className="material-symbols-outlined">
-                account_balance_wallet
-              </span>
-              Finance
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex items-center gap-sm p-sm bg-primary-container text-on-primary-container rounded-xl transition-colors duration-200"
-              href="#"
-            >
-              <span className="material-symbols-outlined">calendar_today</span>
-              Events
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors duration-200"
-              href="#"
-            >
-              <span className="material-symbols-outlined">folder_open</span>
-              Archives
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors duration-200"
-              href="#"
-            >
-              <span className="material-symbols-outlined">inventory_2</span>
-              Inventory
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors duration-200"
-              href="#"
-            >
-              <span className="material-symbols-outlined">article</span>
-              Blog
-            </Link>
-          </li>
-          <li>
-            <Link
-              className="flex items-center gap-sm p-sm text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-colors duration-200"
-              href="#"
-            >
-              <span className="material-symbols-outlined">settings</span>
-              Settings
-            </Link>
-          </li>
-        </ul>
-      </nav>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* Left — Calendar & Categories */}
+        <div className="lg:col-span-5 space-y-4">
+          <Card>
+            <CardHeader className="flex-row items-center justify-between border-b">
+              <CardTitle>OCTOBER 2024</CardTitle>
+              <CardAction className="col-start-auto row-start-auto justify-self-auto flex gap-1">
+                <Button variant="ghost" size="icon-sm">
+                  <span className="material-symbols-outlined text-[18px]">
+                    chevron_left
+                  </span>
+                </Button>
+                <Button variant="ghost" size="icon-sm">
+                  <span className="material-symbols-outlined text-[18px]">
+                    chevron_right
+                  </span>
+                </Button>
+              </CardAction>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium text-muted-foreground mb-2">
+                {weekdays.map((d) => (
+                  <div key={d} className="py-1">
+                    {d}
+                  </div>
+                ))}
+              </div>
+              <div className="grid grid-cols-7 gap-1 text-center text-sm">
+                {calendarCells.map((cell) => (
+                  <button
+                    key={cell.day}
+                    type="button"
+                    className={cn(
+                      "aspect-square flex items-center justify-center rounded-full transition-colors relative",
+                      cell.variant === "outside" && "text-muted-foreground/50",
+                      cell.variant === "default" && "hover:bg-muted",
+                      cell.variant === "selected" && "bg-muted font-medium",
+                      cell.variant === "today" &&
+                        "bg-primary text-primary-foreground font-semibold",
+                    )}
+                  >
+                    {cell.day}
+                    {(cell.variant === "dot" || cell.variant === "dot-red") && (
+                      <span
+                        className={cn(
+                          "absolute bottom-1 w-1.5 h-1.5 rounded-full",
+                          cell.variant === "dot" ? "bg-blue-600" : "bg-red-500",
+                        )}
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Main Content Area */}
-      <main className="p-margin md:p-xl max-w-[1440px] mx-auto w-full md:ml-80">
-        <div className="flex flex-col gap-lg">
-          {/* Section Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-md pb-md border-b border-border-subtle">
-            <div>
-              <h1 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background">
-                EVENTS &amp; AGENDA
-              </h1>
-              <p className="font-body-md text-body-md text-on-surface-variant mt-xs">
-                Manage upcoming organizational activities.
+          <Card>
+            <CardContent className="pt-5">
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                Categories
               </p>
-            </div>
-            <button
-              className="bg-primary text-on-primary font-label-caps text-label-caps uppercase px-md py-sm rounded-full shadow-sm hover:bg-academic-blue transition-colors flex items-center gap-xs"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <span
-                className="material-symbols-outlined"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                add
-              </span>
-              Create Event
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
-            {/* Left Column — Calendar & Categories */}
-            <div className="lg:col-span-5 flex flex-col gap-md">
-              <div className="bg-surface p-md rounded-2xl border border-border-subtle">
-                <div className="flex justify-between items-center mb-md border-b border-border-subtle pb-sm">
-                  <h2 className="font-headline-md text-headline-md text-on-background">
-                    OCTOBER 2024
-                  </h2>
-                  <div className="flex gap-xs">
-                    <button className="p-xs rounded-full hover:bg-surface-container-high transition-colors">
-                      <span className="material-symbols-outlined">
-                        chevron_left
-                      </span>
-                    </button>
-                    <button className="p-xs rounded-full hover:bg-surface-container-high transition-colors">
-                      <span className="material-symbols-outlined">
-                        chevron_right
-                      </span>
-                    </button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-7 gap-xs text-center font-label-caps text-label-caps mb-sm text-on-surface-variant">
-                  <div>S</div>
-                  <div>M</div>
-                  <div>T</div>
-                  <div>W</div>
-                  <div>T</div>
-                  <div>F</div>
-                  <div>S</div>
-                </div>
-                <div className="grid grid-cols-7 gap-xs font-body-md text-body-md text-center">
-                  <div className="aspect-square flex items-center justify-center text-outline">
-                    29
-                  </div>
-                  <div className="aspect-square flex items-center justify-center text-outline">
-                    30
-                  </div>
-                  <div className="aspect-square flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors cursor-pointer">
-                    1
-                  </div>
-                  <div className="aspect-square flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors cursor-pointer relative">
-                    2
-                    <div className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-academic-blue" />
-                  </div>
-                  <div className="aspect-square flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors cursor-pointer">
-                    3
-                  </div>
-                  <div className="aspect-square flex items-center justify-center rounded-full bg-surface-container-high text-on-background cursor-pointer">
-                    4
-                  </div>
-                  <div className="aspect-square flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors cursor-pointer">
-                    5
-                  </div>
-                  <div className="aspect-square flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors cursor-pointer relative">
-                    6
-                    <div className="absolute bottom-2 w-1.5 h-1.5 rounded-full bg-secondary" />
-                  </div>
-                  <div className="aspect-square flex items-center justify-center rounded-full bg-primary text-on-primary">
-                    7
-                  </div>
-                  <div className="aspect-square flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors cursor-pointer">
-                    8
-                  </div>
-                  <div className="aspect-square flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors cursor-pointer">
-                    9
-                  </div>
-                  <div className="aspect-square flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors cursor-pointer">
-                    10
-                  </div>
-                  <div className="aspect-square flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors cursor-pointer">
-                    11
-                  </div>
-                  <div className="aspect-square flex items-center justify-center rounded-full hover:bg-surface-container-highest transition-colors cursor-pointer">
-                    12
-                  </div>
-                </div>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((cat) => (
+                  <Badge key={cat.name} variant="secondary" className="gap-1.5">
+                    <span className={cn("w-2 h-2 rounded-full", cat.dot)} />
+                    {cat.name}
+                  </Badge>
+                ))}
               </div>
-
-              <div className="bg-surface p-md rounded-2xl border border-border-subtle flex flex-col gap-sm">
-                <h3 className="font-label-caps text-label-caps text-on-surface-variant uppercase pb-xs">
-                  Categories
-                </h3>
-                <div className="flex flex-wrap gap-sm">
-                  <span className="inline-flex items-center gap-xs px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-caps text-label-caps">
-                    <div className="w-2 h-2 rounded-full bg-academic-blue" />
-                    Academic
-                  </span>
-                  <span className="inline-flex items-center gap-xs px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-caps text-label-caps">
-                    <div className="w-2 h-2 rounded-full bg-secondary" />
-                    Social
-                  </span>
-                  <span className="inline-flex items-center gap-xs px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-label-caps text-label-caps">
-                    <div className="w-2 h-2 rounded-full bg-focus-yellow" />
-                    Administrative
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Column — Upcoming Events */}
-            <div className="lg:col-span-7 flex flex-col gap-base">
-              <div className="flex justify-between items-center pb-xs border-b border-border-subtle mb-sm">
-                <h2 className="font-headline-md text-headline-md">UPCOMING</h2>
-                <span className="font-label-caps text-label-caps text-on-surface-variant">
-                  4 Events
-                </span>
-              </div>
-
-              {/* Event Card 1 */}
-              <div className="group bg-surface p-md rounded-2xl border border-border-subtle flex flex-col md:flex-row gap-md items-start md:items-center hover:bg-surface-container transition-colors">
-                <div className="flex-shrink-0 w-16 h-16 bg-primary-fixed text-on-primary-fixed rounded-xl flex flex-col items-center justify-center">
-                  <span className="font-label-caps text-label-caps">OCT</span>
-                  <span className="font-headline-md text-headline-md leading-none">
-                    07
-                  </span>
-                </div>
-                <div className="flex-grow">
-                  <div className="flex items-center gap-sm mb-xs">
-                    <span className="px-2 py-1 bg-primary-fixed text-on-primary-fixed rounded-full font-label-caps text-[10px] uppercase">
-                      Academic
-                    </span>
-                    <span className="font-label-caps text-label-caps text-on-surface-variant">
-                      14:00 - 16:00
-                    </span>
-                  </div>
-                  <h3 className="font-headline-md text-headline-md mb-xs">
-                    Guest Lecture: Modern Architecture
-                  </h3>
-                  <p className="font-body-md text-body-md text-on-surface-variant line-clamp-2">
-                    A deep dive into Bauhaus principles and their application in
-                    contemporary software design.
-                  </p>
-                </div>
-                <div className="shrink-0 flex md:flex-col gap-sm mt-sm md:mt-0">
-                  <label className="flex items-center cursor-pointer">
-                    <div className="relative">
-                      <input
-                        checked={notifications.event1}
-                        className="sr-only"
-                        onChange={() => toggleNotification("event1")}
-                        type="checkbox"
-                      />
-                      <div className="block w-10 h-6 bg-surface-container-highest rounded-full" />
-                      <div
-                        className={`dot absolute left-1 top-1 w-4 h-4 rounded-full transition-transform ${
-                          notifications.event1
-                            ? "translate-x-4 bg-primary"
-                            : "bg-outline"
-                        }`}
-                      />
-                    </div>
-                    <span className="ml-2 font-label-caps text-label-caps text-on-surface-variant hidden md:block">
-                      Notify
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-              {/* Event Card 2 */}
-              <div className="group bg-surface p-md rounded-2xl border border-border-subtle flex flex-col md:flex-row gap-md items-start md:items-center hover:bg-surface-container transition-colors">
-                <div className="flex-shrink-0 w-16 h-16 bg-secondary-fixed text-on-secondary-fixed rounded-xl flex flex-col items-center justify-center">
-                  <span className="font-label-caps text-label-caps">OCT</span>
-                  <span className="font-headline-md text-headline-md leading-none">
-                    12
-                  </span>
-                </div>
-                <div className="flex-grow">
-                  <div className="flex items-center gap-sm mb-xs">
-                    <span className="px-2 py-1 bg-secondary-fixed text-on-secondary-fixed rounded-full font-label-caps text-[10px] uppercase">
-                      Social
-                    </span>
-                    <span className="font-label-caps text-label-caps text-on-surface-variant">
-                      19:00 - 23:00
-                    </span>
-                  </div>
-                  <h3 className="font-headline-md text-headline-md mb-xs">
-                    End of Midterms Mixer
-                  </h3>
-                  <p className="font-body-md text-body-md text-on-surface-variant line-clamp-2">
-                    Celebrate the end of midterms with fellow members at the
-                    Student Union.
-                  </p>
-                </div>
-                <div className="flex-shrink-0 flex md:flex-col gap-sm mt-sm md:mt-0">
-                  <label className="flex items-center cursor-pointer">
-                    <div className="relative">
-                      <input
-                        checked={notifications.event2}
-                        className="sr-only"
-                        onChange={() => toggleNotification("event2")}
-                        type="checkbox"
-                      />
-                      <div className="block w-10 h-6 bg-surface-container-highest rounded-full" />
-                      <div
-                        className={`dot absolute left-1 top-1 w-4 h-4 rounded-full transition-transform ${
-                          notifications.event2
-                            ? "translate-x-4 bg-primary"
-                            : "bg-outline"
-                        }`}
-                      />
-                    </div>
-                    <span className="ml-2 font-label-caps text-label-caps text-on-surface-variant hidden md:block">
-                      Notify
-                    </span>
-                  </label>
-                </div>
-              </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
-      </main>
 
-      {/* Modal Dialog (Controlled via State) */}
+        {/* Right — Upcoming */}
+        <div className="lg:col-span-7 space-y-3">
+          <div className="flex items-center justify-between pb-1">
+            <h2 className="font-semibold text-sm uppercase tracking-wide">
+              Upcoming
+            </h2>
+            <span className="text-xs text-muted-foreground">4 Events</span>
+          </div>
+
+          {upcomingEvents.map((ev) => (
+            <Card key={ev.id}>
+              <CardContent className="pt-5 flex flex-col md:flex-row gap-4 items-start md:items-center">
+                <div
+                  className={cn(
+                    "flex-shrink-0 w-16 h-16 rounded-xl flex flex-col items-center justify-center",
+                    ev.dateColor,
+                  )}
+                >
+                  <span className="text-[10px] font-semibold uppercase tracking-widest">
+                    OCT
+                  </span>
+                  <span className="text-xl font-bold leading-none mt-0.5">
+                    {ev.day}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span
+                      className={cn(
+                        "px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase",
+                        eventCategories[ev.category],
+                      )}
+                    >
+                      {ev.category}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      {ev.time}
+                    </span>
+                  </div>
+                  <h3 className="font-semibold">{ev.title}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                    {ev.desc}
+                  </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={notifications[ev.id]}
+                      onClick={() => toggleNotification(ev.id)}
+                      className={cn(
+                        "relative w-10 h-6 rounded-full transition-colors",
+                        notifications[ev.id] ? "bg-primary" : "bg-muted",
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "absolute left-1 top-1 w-4 h-4 rounded-full bg-white shadow-sm transition-transform",
+                          notifications[ev.id] && "translate-x-4",
+                        )}
+                      />
+                    </button>
+                    <span className="text-xs text-muted-foreground hidden md:block">
+                      Notify
+                    </span>
+                  </label>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Create Event Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] bg-on-background/50 backdrop-blur-sm flex items-center justify-center p-md">
-          <div className="bg-surface w-full max-w-[600px] rounded-2xl shadow-lg flex flex-col max-h-[795px] overflow-y-auto">
-            <div className="p-md border-b border-border-subtle flex justify-between items-center bg-surface">
-              <h2 className="font-headline-md text-headline-md uppercase">
-                CREATE NEW EVENT
+        <div
+          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={(e) => e.target === e.currentTarget && closeModal()}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-event-title"
+            className="w-full max-w-2xl bg-card rounded-2xl shadow-xl border border-border overflow-hidden flex flex-col max-h-[90vh]"
+          >
+            <div className="flex items-center justify-between p-5 border-b border-border shrink-0">
+              <h2 id="create-event-title" className="font-semibold">
+                Create New Event
               </h2>
-              <button
-                className="p-xs rounded-full bg-surface text-on-surface hover:bg-surface-container-high transition-colors"
-                onClick={() => setIsModalOpen(false)}
-              >
-                <span className="material-symbols-outlined">close</span>
-              </button>
+              <Button variant="ghost" size="icon-sm" onClick={closeModal}>
+                <span className="material-symbols-outlined text-[18px]">
+                  close
+                </span>
+              </Button>
             </div>
             <form
-              className="p-md flex flex-col gap-md"
+              className="p-5 space-y-4 overflow-y-auto"
               onSubmit={(e) => {
                 e.preventDefault();
-                setIsModalOpen(false);
+                closeModal();
               }}
             >
-              <div className="flex flex-col gap-xs">
-                <label className="font-label-caps text-label-caps uppercase text-on-surface-variant">
-                  Event Title
-                </label>
-                <input
-                  className="bg-surface-container-low p-sm rounded-lg border border-border-subtle font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+              <div className="space-y-1.5">
+                <Label htmlFor="event-title">Event Title</Label>
+                <Input
+                  id="event-title"
                   placeholder="e.g. Design Critique"
-                  type="text"
+                  className="h-9"
+                  required
+                  value={form.title}
+                  onChange={setField("title")}
                 />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
-                <div className="flex flex-col gap-xs">
-                  <label className="font-label-caps text-label-caps uppercase text-on-surface-variant">
-                    Date
-                  </label>
-                  <input
-                    className="bg-surface-container-low p-sm rounded-lg border border-border-subtle font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="event-date">Date</Label>
+                  <Input
+                    id="event-date"
                     type="date"
+                    className="h-9"
+                    required
+                    value={form.date}
+                    onChange={setField("date")}
                   />
                 </div>
-                <div className="flex flex-col gap-xs">
-                  <label className="font-label-caps text-label-caps uppercase text-on-surface-variant">
-                    Time
-                  </label>
-                  <input
-                    className="bg-surface-container-low p-sm rounded-lg border border-border-subtle font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none"
+                <div className="space-y-1.5">
+                  <Label htmlFor="event-time">Time</Label>
+                  <Input
+                    id="event-time"
                     type="time"
+                    className="h-9"
+                    required
+                    value={form.time}
+                    onChange={setField("time")}
                   />
                 </div>
               </div>
-              <div className="flex flex-col gap-xs">
-                <label className="font-label-caps text-label-caps uppercase text-on-surface-variant">
-                  Category
-                </label>
-                <select className="bg-surface-container-low p-sm rounded-lg border border-border-subtle font-body-md focus:border-primary focus:ring-1 focus:ring-primary outline-none">
-                  <option>Academic</option>
-                  <option>Social</option>
-                  <option>Administrative</option>
-                </select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="event-category">Category</Label>
+                  <select
+                    id="event-category"
+                    value={form.category}
+                    onChange={setField("category")}
+                    className="h-9 w-full rounded-2xl border border-transparent bg-input/50 px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30"
+                  >
+                    <option>Academic</option>
+                    <option>Social</option>
+                    <option>Administrative</option>
+                  </select>
+                </div>
               </div>
-              <div className="flex justify-end gap-sm mt-sm">
-                <button
-                  className="px-md py-sm bg-surface text-on-surface rounded-full font-label-caps text-label-caps uppercase hover:bg-surface-container-highest transition-colors"
-                  onClick={() => setIsModalOpen(false)}
-                  type="button"
-                >
+              <div className="space-y-1.5">
+                <Label htmlFor="event-description">Description</Label>
+                <textarea
+                  id="event-description"
+                  rows={3}
+                  placeholder="e.g. Rapat pleno kuartal ketiga..."
+                  value={form.description}
+                  onChange={setField("description")}
+                  className="w-full rounded-2xl border border-transparent bg-input/50 px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 placeholder:text-muted-foreground"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2 flex-shrink-0">
+                <Button variant="outline" type="button" onClick={closeModal}>
                   Cancel
-                </button>
-                <button
-                  className="px-md py-sm bg-primary text-on-primary rounded-full shadow-sm hover:bg-academic-blue transition-colors font-label-caps text-label-caps uppercase"
-                  type="submit"
-                >
-                  Save Event
-                </button>
+                </Button>
+                <Button type="submit">Save Event</Button>
               </div>
             </form>
           </div>
         </div>
       )}
-
-      {/* Mobile Bottom Navigation */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 h-16 flex justify-around items-stretch bg-surface border-t border-border-subtle">
-        <Link
-          className="flex flex-col items-center justify-center text-on-surface-variant h-full px-4 w-full hover:bg-surface-container-highest transition-colors"
-          href="#"
-        >
-          <span className="material-symbols-outlined mb-1">home</span>
-          <span className="font-label-caps text-[10px] uppercase">Home</span>
-        </Link>
-        <Link
-          className="flex flex-col items-center justify-center text-on-surface-variant h-full px-4 w-full hover:bg-surface-container-highest transition-colors"
-          href="#"
-        >
-          <span className="material-symbols-outlined mb-1">payments</span>
-          <span className="font-label-caps text-[10px] uppercase">Finance</span>
-        </Link>
-        <Link
-          className="flex flex-col items-center justify-center text-primary h-full px-4 w-full bg-primary-fixed/20 transition-colors"
-          href="#"
-        >
-          <span
-            className="material-symbols-outlined mb-1"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            event
-          </span>
-          <span className="font-label-caps text-[10px] uppercase">Events</span>
-        </Link>
-        <Link
-          className="flex flex-col items-center justify-center text-on-surface-variant h-full px-4 w-full hover:bg-surface-container-highest transition-colors"
-          href="#"
-        >
-          <span className="material-symbols-outlined mb-1">description</span>
-          <span className="font-label-caps text-[10px] uppercase">Docs</span>
-        </Link>
-        <Link
-          className="flex flex-col items-center justify-center text-on-surface-variant h-full px-4 w-full hover:bg-surface-container-highest transition-colors"
-          href="#"
-        >
-          <span className="material-symbols-outlined mb-1">person</span>
-          <span className="font-label-caps text-[10px] uppercase">Me</span>
-        </Link>
-      </nav>
-
-      {/* Footer */}
-      <footer className="w-full py-xl px-margin flex flex-col md:flex-row justify-between items-center gap-md bg-surface-container-low text-on-background border-t border-border-subtle mt-xl mb-16 md:mb-0 md:ml-80">
-        <div className="font-headline-md text-headline-md uppercase text-center md:text-left">
-          ©2024 CAMPUS_ORG_SYSTEM
-        </div>
-        <div className="flex flex-wrap justify-center gap-md font-label-caps text-label-caps text-on-surface-variant">
-          <Link
-            className="hover:text-primary transition-colors uppercase"
-            href="#"
-          >
-            Privacy
-          </Link>
-          <Link
-            className="hover:text-primary transition-colors uppercase"
-            href="#"
-          >
-            Terms
-          </Link>
-          <Link
-            className="hover:text-primary transition-colors uppercase"
-            href="#"
-          >
-            Support
-          </Link>
-          <Link
-            className="hover:text-primary transition-colors uppercase"
-            href="#"
-          >
-            Archive
-          </Link>
-        </div>
-      </footer>
     </div>
   );
 }
