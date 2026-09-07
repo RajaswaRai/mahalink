@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -66,8 +66,10 @@ function NavItem({
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isSheetMounted, setIsSheetMounted] = useState(false);
   const [sheetVisible, setSheetVisible] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const menuSheetItems = [
@@ -91,6 +93,22 @@ export function AdminSidebar() {
     }
     setSheetVisible(false);
     closeTimer.current = setTimeout(() => setIsSheetMounted(false), 300);
+  };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+
+    try {
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+
+      if (!response.ok) {
+        throw new Error("Logout failed");
+      }
+
+      router.replace("/login");
+    } catch {
+      setIsLoggingOut(false);
+    }
   };
 
   useEffect(() => {
@@ -156,7 +174,7 @@ export function AdminSidebar() {
 
         {/* User section */}
         <div className="p-3 border-t border-border">
-          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted transition-colors cursor-pointer">
+          <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted transition-colors">
             <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
               <span className="material-symbols-outlined text-[16px] text-muted-foreground">
                 person
@@ -168,9 +186,18 @@ export function AdminSidebar() {
                 admin@mahalink.id
               </p>
             </div>
-            <span className="material-symbols-outlined text-[16px] text-muted-foreground">
-              more_vert
-            </span>
+            <button
+              type="button"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              aria-label="Logout"
+              title="Logout"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <span className="material-symbols-outlined text-[18px]">
+                {isLoggingOut ? "progress_activity" : "logout"}
+              </span>
+            </button>
           </div>
         </div>
       </aside>
@@ -178,7 +205,11 @@ export function AdminSidebar() {
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 h-16 flex justify-around items-stretch bg-card border-t border-border safe-area-inset-bottom">
         {bottomNavItems.slice(0, 2).map((item) => (
-          <MobileNavLink key={item.href} item={item} active={isActive(item.href)} />
+          <MobileNavLink
+            key={item.href}
+            item={item}
+            active={isActive(item.href)}
+          />
         ))}
 
         {/* Center — Menu sheet trigger */}
@@ -186,7 +217,9 @@ export function AdminSidebar() {
           onClick={openSheet}
           className={cn(
             "flex flex-col items-center justify-center h-full px-4 transition-colors w-full gap-0.5",
-            isSheetMounted ? "text-primary" : "text-muted-foreground hover:text-foreground",
+            isSheetMounted
+              ? "text-primary"
+              : "text-muted-foreground hover:text-foreground",
           )}
         >
           <span className="material-symbols-outlined text-[22px]">menu</span>
@@ -194,7 +227,11 @@ export function AdminSidebar() {
         </button>
 
         {bottomNavItems.slice(2).map((item) => (
-          <MobileNavLink key={item.href} item={item} active={isActive(item.href)} />
+          <MobileNavLink
+            key={item.href}
+            item={item}
+            active={isActive(item.href)}
+          />
         ))}
       </nav>
 
@@ -245,7 +282,9 @@ export function AdminSidebar() {
                       <span
                         className="material-symbols-outlined text-[24px]"
                         style={{
-                          fontVariationSettings: active ? "'FILL' 1" : "'FILL' 0",
+                          fontVariationSettings: active
+                            ? "'FILL' 1"
+                            : "'FILL' 0",
                         }}
                       >
                         {item.icon}
@@ -257,6 +296,21 @@ export function AdminSidebar() {
                   </li>
                 );
               })}
+              <li>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="flex w-full flex-col items-center gap-1.5 rounded-2xl p-3 text-center text-destructive transition-colors hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <span className="material-symbols-outlined text-[24px]">
+                    {isLoggingOut ? "progress_activity" : "logout"}
+                  </span>
+                  <span className="text-[10px] font-medium leading-tight">
+                    {isLoggingOut ? "Logging out" : "Logout"}
+                  </span>
+                </button>
+              </li>
             </ul>
           </div>
         </div>
